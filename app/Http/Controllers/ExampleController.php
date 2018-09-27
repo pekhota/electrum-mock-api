@@ -28,14 +28,17 @@ class ExampleController extends Controller
         $method = $request->input('method');
         $params = $request->input('params');
 
-        return $this->makeResponse($request, $this->route($method, $params));
+        return $this->makeResponse($request, $this->route($request, $method, $params));
     }
 
-    private function route($method, $params) {
+    private function route($request, $method, $params) {
         $electrum = new Electrum();
         if(method_exists($electrum, $method)) {
+            if(($rules = $electrum->getValidationRules($method)) !== null) {
+                $this->validate($request, $rules);
+            }
             // https://stackoverflow.com/questions/251485/dynamic-class-method-invocation-in-php
-            return $electrum->{$method}();
+            return call_user_func_array(array($electrum, $method), array($params));
         }
         throw new NotFoundHttpException("Method {$method} not supported.", null, -32601);
     }

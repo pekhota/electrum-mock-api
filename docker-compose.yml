@@ -6,8 +6,10 @@ services:
       dockerfile: Dockerfile
     container_name: 'electrum-mock-php-nginx'
     ports:
-      - '8000:80'
+      - '8050:80'
     volumes:
       - ./:/app
     environment:
       - ELECTRUM_BALANCE=0
+      - ELECTRUM_ADDRESS_BALANCE_CONFIRMED=1.008
+      - ELECTRUM_ADDRESS_BALANCE_UNCONFIRMED=0.004

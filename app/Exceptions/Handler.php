@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
         }
 
         if($exception instanceof ValidationException) {
-            return $this->errorResponse($request, $exception, -32600);
+            return $this->validationErrorResponse($request, $exception, -32600);
         }
         return parent::render($request, $exception);
     }
@@ -68,6 +68,25 @@ class Handler extends ExceptionHandler
             'error' => [
                 'code' => empty($code) ? $exception->getCode() : $code,
                 'message' => $exception->getMessage()
+            ]
+        ];
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $req
+     * @param Exception $exception
+     * @return array
+     */
+    private function validationErrorResponse($req, ValidationException $exception, $code = null) {
+        $errors = $exception->errors();
+
+
+        return [
+            'id' => $req->input('id'),
+            "jsonrpc" => "2.0",
+            'error' => [
+                'code' => empty($code) ? $exception->getCode() : $code,
+                'message' => $exception->errors()[array_keys($errors)[0]][0]
             ]
         ];
     }
